@@ -1,0 +1,8 @@
+{
+  "name": "minepixel-relay",
+  "version": "1.0.0",
+  "main": "relay.cjs",
+  "scripts": { "start": "node relay.cjs" },
+  "dependencies": { "ws": "^8.18.0" },
+  "engines": { "node": ">=18" }
+}
