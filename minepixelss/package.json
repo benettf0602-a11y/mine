@@ -1,0 +1,23 @@
+{
+  "name": "minepixelss",
+  "version": "1.0.0",
+  "description": "MinePixelSS – MinePixel szerver-készítő és kezelő",
+  "main": "main.cjs",
+  "scripts": {
+    "sync": "node scripts/sync-game.cjs",
+    "prestart": "node scripts/sync-game.cjs",
+    "start": "electron .",
+    "predist": "node scripts/sync-game.cjs",
+    "dist": "electron-builder",
+    "pack": "electron-builder --win --dir"
+  },
+  "dependencies": { "ws": "^8.22.1" },
+  "devDependencies": { "electron": "^33.0.0", "electron-builder": "^25.0.0" },
+  "build": {
+    "appId": "hu.minepixel.ss",
+    "productName": "MinePixelSS",
+    "files": ["main.cjs", "preload-*.cjs", "panel/**/*", "game/**/*", "build/**/*", "sample-plugins/**/*"],
+    "win": { "target": "dir", "icon": "build/icon.ico" },
+    "linux": { "target": "AppImage" }
+  }
+}

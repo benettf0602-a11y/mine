@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MinePixelSS</title><link rel="stylesheet" href="panel.css"></head>
+<body>
+<div id="app">
+  <aside>
+    <div class="logo"><span class="cube"></span>MinePixel<b>SS</b></div>
+    <div class="sect">Szervereim</div>
+    <div id="list"></div>
+    <button class="btn green wide" id="btn-new">+ Új szerver</button>
+    <div class="grow"></div>
+    <div id="gw" class="gw"></div>
+    <button class="btn wide" id="btn-settings">⚙ Beállítások</button>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<dialog id="dlg-new"><form method="dialog" id="f-new">
+  <h2>Új szerver</h2>
+  <label>Szerver neve<input id="n-name" maxlength="24" placeholder="pl. Legend" autocomplete="off"></label>
+  <div class="addr-prev">IP-cím: <b id="n-addr">ht.….gg</b></div>
+  <div class="two"><label>Világ magja (opcionális)<input id="n-seed" placeholder="véletlen"></label>
+  <label>Nehézség<select id="n-diff"><option value="0">Békés</option><option value="1">Könnyű</option><option value="2" selected>Normál</option><option value="3">Nehéz</option></select></label></div>
+  <div class="two"><label>Max. játékos<input id="n-max" type="number" min="1" max="40" value="10"></label>
+  <label>Admin kód (/ad parancshoz)<input id="n-code" type="password" placeholder="titkos kód" autocomplete="off"></label></div>
+  <label class="chk"><input type="checkbox" id="n-smp" checked> SMP mód (pénz, bolt, otthonok, pluginok, WorldEdit)</label>
+  <p id="n-err" class="err"></p>
+  <div class="row"><button class="btn" value="cancel" id="n-cancel" type="button">Mégse</button><button class="btn green" id="n-ok" type="submit">Létrehozás</button></div>
+</form></dialog>
+
+<dialog id="dlg-set"><form method="dialog" id="f-set">
+  <h2>Beállítások</h2>
+  <label>Gateway port<input id="s-port" type="number" min="1024" max="65535"></label>
+  <label>Nyilvános gateway cím (ezt kapják a játékosok)<input id="s-gw" placeholder="pl. ws://12.34.56.78:8787  vagy  wss://gateway.pelda.hu"></label>
+  <div class="two"><label>Cím előtag<input id="s-prefix" maxlength="8"></label><label>Cím végződés<input id="s-domain" maxlength="8"></label></div>
+  <p class="hint">A <b>ht.név.gg</b> cím nem valódi domain: a MinePixel játék a gateway-en keresztül oldja fel. Az internetes eléréshez a gateway portját (alapból 8787) tovább kell engedni a routeren, vagy a MinePixelSS-t egy nyilvános szerveren kell futtatni.</p>
+  <p id="s-err" class="err"></p>
+  <div class="row"><button class="btn" value="cancel" type="button" id="s-cancel">Mégse</button><button class="btn green" type="submit">Mentés</button></div>
+</form></dialog>
+<div id="toast"></div>
+<script src="panel.js"></script>
+</body></html>

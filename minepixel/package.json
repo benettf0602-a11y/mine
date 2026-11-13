@@ -1,0 +1,46 @@
+{
+  "name": "minepixel",
+  "version": "1.1.0",
+  "description": "MinePixel - Minecraft 1.20.1 stílusú voxel játék",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "pack": "electron-builder --win --dir"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^8.22.1"
+  },
+  "type": "module",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "hu.minepixel.app",
+    "productName": "MinePixel",
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "server/**/*",
+      "index.html",
+      "style.css",
+      "src/**/*",
+      "vendor/**/*",
+      "build/**/*"
+    ],
+    "win": {
+      "target": "dir",
+      "icon": "build/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "mac": {
+      "target": "dmg"
+    }
+  }
+}

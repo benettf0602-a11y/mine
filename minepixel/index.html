@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>MinePixel</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+<div id="bossbar" style="display:none"><div class="bn">Ender sárkány</div><div class="bb"><div id="bossfill"></div></div></div>
+  <div id="crosshair"></div>
+  <div id="debug" class="hidden"></div>
+  <div id="toast"></div>
+  <div id="itemname"></div>
+  <div id="bars">
+    <div id="hearts" class="row"></div>
+    <div id="foods" class="row right"></div>
+  </div>
+  <div id="armor" class="row"></div>
+  <div id="air" class="row"></div>
+  <div id="xpbar"><div id="xpfill"></div><span id="xplvl"></span></div>
+  <div id="hotbar"></div>
+  <div id="hurt"></div>
+  <div id="water-ov"></div>
+  <div id="lava-ov"></div>
+  <div id="night-hint"></div>
+  <div id="chat"></div>
+  <input id="chat-in" class="hidden" maxlength="200" autocomplete="off" placeholder="Írj üzenetet… (Enter: küldés, Esc: mégse)">
+  <div id="plist" class="hidden"></div>
+  <div id="netbadge" class="hidden"></div>
+  <div id="sidebar" class="hidden"><div class="sb-title">MinePixel</div><div class="sb-line"></div>
+    <div class="sb-row"><span>Név</span><b id="sb-name"></b></div><div class="sb-row"><span>Pénz</span><b id="sb-bal" class="gold"></b></div><div class="sb-line"></div>
+    <div class="sb-row"><span>Rang</span><b id="sb-rank"></b></div><div class="sb-row"><span>Online</span><b id="sb-on"></b></div><div class="sb-row"><span>Idő</span><b id="sb-time"></b></div><div class="sb-row"><span>Világ</span><b id="sb-dim"></b></div>
+    <div class="sb-foot">B: bolt · /help</div></div>
+</div>
+
+<!-- Képernyők -->
+<div id="loading" class="screen hidden"><div class="panel center"><h2>Világ betöltése…</h2><div class="bar"><div id="loadfill"></div></div><p id="loadtxt">Terep generálása</p></div></div>
+
+<div id="title" class="screen">
+  <div class="logo"><span>M</span><span>I</span><span>N</span><span>E</span><span class="gap"></span><span>P</span><span>I</span><span>X</span><span>E</span><span>L</span></div>
+  <div class="sub">Java Edition 1.20.1 stílus</div>
+  <div class="menu">
+    <button class="btn" data-act="play">Egyjátékos mód</button>
+    <button class="btn green" data-act="smp">Multiplayer · MinePixel SMP</button>
+    <button class="btn blue" data-act="friends">Barátok · Multiplayer</button>
+    <button class="btn" data-act="settings">Beállítások</button>
+    <button class="btn" data-act="fullscreen">Teljes képernyő</button>
+    <button class="btn" data-act="quit">Kilépés</button>
+  </div>
+  <div class="splash" id="splash">Kockás!</div>
+  <div class="foot">MinePixel · nem hivatalos, rajongói projekt</div>
+</div>
+
+<div id="worlds" class="screen hidden">
+  <div class="panel">
+    <h2>Világ kiválasztása</h2>
+    <div id="worldlist"></div>
+    <div class="row-btns">
+      <button class="btn" data-act="newworld">Új világ létrehozása</button>
+      <button class="btn" data-act="back-title">Vissza</button>
+    </div>
+  </div>
+</div>
+
+<div id="cmdui" class="overlay hidden">
+  <div class="panel">
+    <h2 id="cmd-title">Parancsblokk</h2>
+    <label>Parancs<input id="cmd-in" maxlength="256" autocomplete="off" placeholder="pl. say Szia!  ·  tp @p 0 70 0  ·  setblock ~ ~1 ~ stone"></label>
+    <div class="toggles"><button class="btn small" id="cmd-auto" data-v="0">Mindig aktív: KI</button><button class="btn small" id="cmd-cond" data-v="0">Feltételes: KI</button></div>
+    <div class="row-btns"><button class="btn green" id="cmd-ok">Kész</button><button class="btn" id="cmd-run">Futtatás most</button><button class="btn" id="cmd-cancel">Mégse</button></div>
+  </div>
+</div>
+
+<div id="create" class="screen hidden">
+  <div class="panel">
+    <h2>Új világ</h2>
+    <label>Világ neve<input id="c-name" maxlength="24" value="Új világ"></label>
+    <label>Seed (üresen véletlen)<input id="c-seed" maxlength="24" placeholder="pl. 12345 vagy bármilyen szöveg"></label>
+    <div class="toggles">
+      <button class="btn small" id="c-mode" data-v="survival">Mód: Túlélő</button>
+      <button class="btn small" id="c-diff" data-v="2">Nehézség: Normál</button>
+      <button class="btn small" id="c-online" data-v="0">Barátok meghívása: KI</button>
+    </div>
+    <div class="toggles">
+      <button class="btn small" id="c-import">Minecraft térkép importálása (Java)</button>
+      <button class="btn small" id="c-rad">Import méret</button>
+    </div>
+    <input type="file" id="c-files" webkitdirectory multiple class="hidden">
+    <p id="c-impinfo" class="hint"></p>
+    <div class="row-btns">
+      <button class="btn green" data-act="docreate">Világ létrehozása</button>
+      <button class="btn" data-act="back-worlds">Mégse</button>
+    </div>
+  </div>
+</div>
+
+<div id="smp" class="screen hidden">
+  <div class="panel wide">
+    <h2>Multiplayer · MinePixel SMP</h2>
+    <div class="friend smpcard"><div class="fi"><div class="fn"><span class="dot" id="smp-dot"></span>MinePixel SMP</div><div class="fs" id="smp-info">Ellenőrzés…</div></div><button class="btn green" id="smp-join" data-act="smp-join">Csatlakozás</button></div>
+    <p class="hint">Közös túlélő világ mindenkinek: építs, fedezz fel, bányássz, adj-vegyél a boltban. Kreatív mód csak az adminnak van.</p>
+    <label>Játékosneved<input id="smp-name" maxlength="16"></label>
+    <details class="adv"><summary>Szerver beállítások</summary>
+      <label>Szerver címe<input id="smp-addr" placeholder="pl. wss://minepixel.onrender.com vagy 192.168.1.5:25566"></label>
+      <p class="hint">Az admin adja meg a címet. Ha az admin játéka a saját gépén fut, a cím az ő IP-je és a 25566-os port.</p>
+    </details>
+    <details class="adv"><summary>Admin: szerver indítása</summary>
+      <label>Admin kód a /ad parancshoz<input id="smp-code" type="password" placeholder="pl. a titkos számod"></label>
+      <label>Admin kulcs (ha a relay védett)<input id="smp-key" type="password" placeholder="SMP_ADMIN_KEY"></label>
+      <p class="hint">A világ addig él, amíg az admin játéka fut. A pénz, otthonok és a világ automatikusan mentődik.</p>
+      <div class="row-btns"><button class="btn blue" data-act="smp-host">Szerver indítása (admin)</button></div>
+    </details>
+    <p id="smp-status" class="status"></p>
+    <div class="row-btns"><button class="btn" data-act="smp-refresh">Frissítés</button><button class="btn" data-act="back-title">Vissza</button></div>
+  </div>
+</div>
+
+<div id="shop" class="screen hidden">
+  <div class="panel wide">
+    <h2>Bolt</h2>
+    <div class="shop-top"><div class="shop-tabs"><button class="btn small" data-st="buy">Vásárlás</button><button class="btn small" data-st="sell">Eladás</button></div>
+      <div class="shop-qty">Mennyiség: <button class="btn small" data-qty="1">1</button><button class="btn small" data-qty="8">8</button><button class="btn small" data-qty="16">16</button><button class="btn small" data-qty="64">64</button></div>
+      <div class="shop-balbox">Egyenleg: <b id="shop-bal" class="gold"></b></div></div>
+    <input id="shop-q" placeholder="Keresés…" autocomplete="off">
+    <div id="shop-sellbtns" class="row-btns hidden"><button class="btn small" id="shop-sell-hand">Kézben lévő eladása</button><button class="btn small green" id="shop-sell-all">Minden eladható eladása</button></div>
+    <div class="shop-body"><div id="shop-cats"></div><div id="shop-grid"></div></div>
+    <p id="shop-msg" class="status"></p>
+    <div class="row-btns"><button class="btn" data-act="shop-close">Bezárás (Esc)</button></div>
+  </div>
+</div>
+
+<div id="friends" class="screen hidden">
+  <div class="panel wide">
+    <h2>Barátok · Multiplayer</h2>
+    <div class="cols">
+      <div class="col">
+        <div class="sect">Te</div>
+        <label>Játékosneved<input id="f-name" maxlength="16"></label>
+        <div class="sect">Csatlakozás meghívó kóddal</div>
+        <div class="addrow"><input id="f-code" placeholder="pl. ht.legend.gg  vagy  K7Q2MX@192.168.1.5:25566"><button class="btn green small" data-act="f-join">Csatlakozás</button></div>
+        <div class="sect">Barát hozzáadása</div>
+        <div class="addrow"><input id="f-addname" maxlength="16" placeholder="Barát neve"></div>
+        <div class="addrow"><input id="f-addcode" placeholder="Meghívó kódja"><button class="btn small" data-act="f-add">Hozzáadás</button></div>
+        <details class="adv"><summary>Haladó: MinePixelSS gateway és relay</summary>
+          <p class="hint">MinePixelSS szerverhez (pl. <code>ht.legend.gg</code>) add meg a gateway címét, amit a szerver tulajdonosa ad: <code>ws://cím:8787</code> vagy <code>wss://…</code></p>
+          <input id="f-gateway" placeholder="MinePixelSS gateway címe">
+          <p class="hint">Alapból a játék saját szervert indít (LAN-on azonnal megy, interneten a 25566-os port továbbítása kell). Ha van saját relay szervered (<code>node server/relay.cjs</code>), írd ide a címét, és port nélkül is megy: <code>ws://cím:8787</code></p>
+          <input id="f-relay" placeholder="üresen: beépített szerver">
+        </details>
+      </div>
+      <div class="col">
+        <div class="sect">Barátlista</div>
+        <div id="friendlist"></div>
+      </div>
+    </div>
+    <p id="f-status" class="status"></p>
+    <div class="row-btns"><button class="btn" data-act="f-refresh">Frissítés</button><button class="btn" data-act="back-title">Vissza</button></div>
+  </div>
+</div>
+
+<div id="host" class="screen hidden">
+  <div class="panel wide">
+    <h2>Barátok meghívása</h2>
+    <p id="h-status" class="status"></p>
+    <div id="h-codes"></div>
+    <div class="sect">Játékosok a világban</div>
+    <div id="h-players"></div>
+    <div class="sect">Gyors meghívó</div>
+    <div id="h-friends"></div>
+    <div class="row-btns">
+      <button class="btn red" data-act="h-stop" id="h-stop">Világ lezárása (online KI)</button>
+      <button class="btn" data-act="h-back">Vissza a játékba</button>
+    </div>
+  </div>
+</div>
+
+<div id="settings" class="screen hidden">
+  <div class="panel">
+    <h2>Beállítások</h2>
+    <label>Látótávolság: <b id="s-rd-v"></b><input type="range" id="s-rd" min="3" max="12" step="1"></label>
+    <label>Látószög (FOV): <b id="s-fov-v"></b><input type="range" id="s-fov" min="50" max="110" step="1"></label>
+    <label>Egér érzékenység: <b id="s-sens-v"></b><input type="range" id="s-sens" min="20" max="200" step="1"></label>
+    <label>Hangerő: <b id="s-vol-v"></b><input type="range" id="s-vol" min="0" max="100" step="1"></label>
+    <label>Zene: <b id="s-mus-v"></b><input type="range" id="s-mus" min="0" max="100" step="1"></label>
+    <div class="toggles">
+      <button class="btn small" id="s-smooth">Szép fény: BE</button>
+      <button class="btn small" id="s-clouds">Felhők: BE</button>
+      <button class="btn small" id="s-bob">Fejbillegés: BE</button>
+    </div>
+    <div class="row-btns"><button class="btn" data-act="settings-done">Kész</button></div>
+  </div>
+</div>
+
+<div id="pause" class="screen hidden">
+  <div class="panel center">
+    <h2>Játék szüneteltetve</h2>
+    <div class="menu">
+      <button class="btn" data-act="resume">Vissza a játékba</button>
+      <button class="btn green hidden" id="pause-shop" data-act="shop-open">Bolt</button>
+      <button class="btn blue" data-act="invite">Barátok meghívása</button>
+      <button class="btn" data-act="settings-ingame">Beállítások</button>
+      <button class="btn" data-act="savequit">Mentés és kilépés a főmenübe</button>
+    </div>
+    <p class="hint">Mozgás: WASD · Ugrás: Szóköz · Futás: Ctrl · Lopakodás: Shift<br>Inventár: E · Eldobás: Q · Debug: F3 · Teljes képernyő: F11</p>
+  </div>
+</div>
+
+<div id="death" class="screen hidden">
+  <div class="panel center">
+    <h2 class="red">Meghaltál!</h2>
+    <p id="death-msg"></p>
+    <div class="menu"><button class="btn" data-act="respawn">Újraéledés</button><button class="btn" data-act="savequit">Főmenü</button></div>
+  </div>
+</div>
+
+<div id="inv" class="screen hidden">
+  <div class="panel inv-panel" id="inv-panel"></div>
+</div>
+<div id="cursor"></div>
+<div id="tooltip"></div>
+<div id="clickstart" class="hidden">Kattints a játékhoz</div>
+
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+<script type="module" src="src/game.js"></script>
+</body>
+</html>
